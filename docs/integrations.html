@@ -247,6 +247,14 @@ module.exports = function(eleventyConfig) {
     <li>Example: <code>{p:75}</code></li>
   </ul>
 
+  <h3>Horizontal progress bars</h3>
+  <pre><code>{h:value}</code></pre>
+  <ul>
+    <li>Value: 0–100 (percentage)</li>
+    <li>Single value only</li>
+    <li>Example: <code>{h:65}</code></li>
+  </ul>
+
   </section>
 
   <section>
@@ -295,7 +303,7 @@ font-variant-ligatures: common-ligatures contextual;</code></pre>
 
   <h3>1. Pattern Matching</h3>
   <p>Match chart syntax with this regex:</p>
-  <pre><code>/\{[blp]:\d+(?:,\d+)*\}/g</code></pre>
+  <pre><code>/\{[blph]:\d+(?:,\d+)*\}/g</code></pre>
 
   <h3>2. Wrapping in HTML</h3>
   <p>Wrap matches in a span with the font applied:</p>
@@ -303,7 +311,7 @@ font-variant-ligatures: common-ligatures contextual;</code></pre>
 
   <h3>3. Example: Vanilla JavaScript</h3>
   <pre><code>function renderDatatype(text) {
-  const pattern = /\{[blp]:\d+(?:,\d+)*\}/g;
+  const pattern = /\{[blph]:\d+(?:,\d+)*\}/g;
   return text.replace(pattern, match =&gt;
     `&lt;span class="datatype"&gt;${match}&lt;/span&gt;`
   );
@@ -316,7 +324,7 @@ document.getElementById('output').innerHTML = output;</code></pre>
 
   <h3>4. Example: Markdown-it Plugin</h3>
   <pre><code>function datatypePlugin(md) {
-  const pattern = /\{[blp]:\d+(?:,\d+)*\}/g;
+  const pattern = /\{[blph]:\d+(?:,\d+)*\}/g;
 
   md.core.ruler.push('datatype', state =&gt; {
     for (const token of state.tokens) {
@@ -341,7 +349,7 @@ md.use(datatypePlugin);</code></pre>
 
   <h3>5. Example: React Component</h3>
   <pre><code>function Chart({ children }) {
-  const pattern = /\{[blp]:\d+(?:,\d+)*\}/g;
+  const pattern = /\{[blph]:\d+(?:,\d+)*\}/g;
 
   const parts = children.split(pattern);
   const matches = children.match(pattern) || [];
@@ -435,5 +443,6 @@ if (window.Prism) {
   Prism.highlightAll();
 }
 </script>
+<script src="dev-reload.js"></script>
 </body>
 </html>

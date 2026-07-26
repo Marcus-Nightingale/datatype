@@ -7,6 +7,7 @@ from sources.config import FontParams
 from sources.glyphs.base_imported import draw_base_glyphs
 from sources.glyphs.bar import draw_bar_glyphs
 from sources.glyphs.pie import draw_pie_glyphs
+from sources.glyphs.progress import draw_progress_glyphs
 from sources.glyphs.sparkline import draw_sparkline_glyphs
 
 
@@ -65,16 +66,32 @@ def test_pie_glyphs_cover_zero_through_one_hundred():
     assert _record(glyphs["pie_100"][1])
 
 
+def test_progress_glyphs_cover_zero_through_one_hundred():
+    glyphs = {}
+    params = FontParams(bar_width=405, point_width=36, line_thickness=65)
+
+    draw_progress_glyphs(glyphs, params)
+
+    assert all(f"progress_{percentage}" in glyphs for percentage in range(101))
+    assert len(glyphs) == 101
+    assert all(width == 846 for width, _ in glyphs.values())
+    assert _record(glyphs["progress_0"][1])
+    assert _record(glyphs["progress_50"][1])
+    assert _record(glyphs["progress_100"][1])
+
+
 def test_visible_glyphs_use_truetype_winding():
     base_glyphs = {}
     bar_glyphs = {}
     spark_glyphs = {}
     pie_glyphs = {}
+    progress_glyphs = {}
 
     draw_base_glyphs(base_glyphs)
     draw_bar_glyphs(bar_glyphs, FontParams(max_value=10))
     draw_sparkline_glyphs(spark_glyphs, FontParams(max_value=2))
     draw_pie_glyphs(pie_glyphs)
+    draw_progress_glyphs(progress_glyphs)
 
     # TrueType outer contours wind clockwise, producing a negative signed area.
     assert _signed_area(base_glyphs[".notdef"][1]) < 0
@@ -84,3 +101,6 @@ def test_visible_glyphs_use_truetype_winding():
     assert _signed_area(pie_glyphs["pie_0"][1]) < 0
     assert _signed_area(pie_glyphs["pie_50"][1]) < 0
     assert _signed_area(pie_glyphs["pie_100"][1]) < 0
+    assert _signed_area(progress_glyphs["progress_0"][1]) < 0
+    assert _signed_area(progress_glyphs["progress_50"][1]) < 0
+    assert _signed_area(progress_glyphs["progress_100"][1]) < 0

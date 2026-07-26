@@ -14,6 +14,8 @@ FONT_PATH = (
     / "variable"
     / "Datatype[wdth,wght].ttf"
 )
+VARIABLE_WOFF2_PATH = FONT_PATH.with_suffix(".woff2")
+DOCS_FONT_PATH = Path(__file__).resolve().parents[2] / "docs" / "Datatype.woff2"
 
 
 @pytest.fixture(scope="module")
@@ -54,9 +56,13 @@ def test_variable_axes_match_public_contract(font):
 def test_font_version_and_latin_core_coverage(font):
     assert font["head"].fontRevision == pytest.approx(float(FONT_VERSION), abs=0.001)
     assert len(font.getBestCmap()) == 319
-    assert font["maxp"].numGlyphs == 10_850
+    assert font["maxp"].numGlyphs == 10_951
 
 
 def test_mixed_width_metadata_is_not_monospaced(font):
     assert font["post"].isFixedPitch == 0
     assert font["OS/2"].panose.bProportion != 9
+
+
+def test_docs_font_matches_built_variable_font():
+    assert DOCS_FONT_PATH.read_bytes() == VARIABLE_WOFF2_PATH.read_bytes()

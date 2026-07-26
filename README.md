@@ -13,6 +13,7 @@ Datatype uses OpenType ligature substitution to transform simple text expression
 - **Bar charts**: `{b:1,3,7,9,4,2}` — up to 20 values
 - **Sparklines**: `{l:2,5,3,8,1,6,4}` — up to 20 points
 - **Pie charts**: `{p:75}` — single percentage
+- **Progress bars**: `{h:65}` — single percentage
 
 **Variable font axes:**
 - **Width (wdth)**: 50–150 — controls spacing (default: 100)
@@ -95,6 +96,16 @@ Datatype uses OpenType ligature substitution to transform simple text expression
 - **Value**: 0–100 (percentage)
 - **Single value** showing percentage filled
 - **Example**: `{p:62}`
+
+### Horizontal Progress Bars
+
+```
+{h:value}
+```
+
+- **Value**: 0–100 (percentage)
+- **Single value** filling an outlined horizontal track
+- **Example**: `{h:65}`
 
 ---
 

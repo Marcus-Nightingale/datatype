@@ -502,7 +502,7 @@
 <div class="hero">
   <h1>Datatype</h1>
   <p class="tagline">A variable font that turns text into charts.</p>
-  <div class="demo">{b:20,55,40,80,65}&nbsp;&nbsp;&nbsp;{l:10,40,25,70,50,90}&nbsp;&nbsp;&nbsp;{p:73}&nbsp;&nbsp;&nbsp;{b:85,30,60,10,45}&nbsp;&nbsp;&nbsp;{l:50,20,80,35,65,10}&nbsp;&nbsp;&nbsp;{p:41}</div>
+  <div class="demo">{b:20,55,40,80,65}&nbsp;&nbsp;&nbsp;{l:10,40,25,70,50,90}&nbsp;&nbsp;&nbsp;{p:73}&nbsp;&nbsp;&nbsp;{h:65}&nbsp;&nbsp;&nbsp;{b:85,30,60,10,45}&nbsp;&nbsp;&nbsp;{l:50,20,80,35,65,10}&nbsp;&nbsp;&nbsp;{p:41}&nbsp;&nbsp;&nbsp;{h:38}</div>
 </div>
 
 <!-- CTA bar -->
@@ -537,6 +537,11 @@
         <div class="rendered">{p:65}</div>
         <code>{p:65}</code>
         <div class="type-label">Pie chart</div>
+      </div>
+      <div class="syntax-card">
+        <div class="rendered">{h:65}</div>
+        <code>{h:65}</code>
+        <div class="type-label">Progress bar</div>
       </div>
     </div>
   </div>
@@ -764,6 +769,16 @@ Results <span class="sel">&lt;span class="chart"&gt;</span>{b:30,70,20,90}<span 
         <div class="ref-details">62% filled</div>
       </div>
     </div>
+
+    <div class="syntax-ref">
+      <h3>Progress bars <code>{h:value}</code></h3>
+      <p>A single value, 0&ndash;100, filling an outlined horizontal track.</p>
+      <div class="ref-example">
+        <div class="rendered">{h:65}</div>
+        <code>{h:65}</code>
+        <div class="ref-details">65% filled</div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -908,5 +923,6 @@ fetch('https://api.github.com/repos/franktisellano/datatype')
     })
   .catch(error => console.error('Error fetching GitHub stars:', error));
 </script>
+<script src="dev-reload.js"></script>
 </body>
 </html>

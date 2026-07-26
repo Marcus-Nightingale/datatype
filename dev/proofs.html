@@ -276,6 +276,7 @@
     <button class="tab-btn active" onclick="showTab('bar')">Bar Charts</button>
     <button class="tab-btn" onclick="showTab('sparkline')">Sparklines</button>
     <button class="tab-btn" onclick="showTab('pie')">Pie Charts</button>
+    <button class="tab-btn" onclick="showTab('progress')">Progress Bars</button>
   </div>
   <div class="weight-bar">
     <div class="control-row">
@@ -327,6 +328,14 @@
   <div class="grid" id="pie-grid"></div>
 </div>
 
+<div id="tab-progress" class="tab-panel">
+  <div class="panel-header">
+    <h2>Horizontal Progress Bars</h2>
+    <span class="subtitle">Syntax: {h:value} — from 1 to 100</span>
+  </div>
+  <div class="grid" id="progress-grid"></div>
+</div>
+
 <script>
 let currentWght = 400;
 let currentWdth = 100;
@@ -355,7 +364,7 @@ function setAxis(axis, val) { updateAxis(axis, val); }
 
 function showTab(name) {
   document.querySelectorAll('.tab-btn').forEach((b, i) => {
-    b.classList.toggle('active', ['bar','sparkline','pie'][i] === name);
+    b.classList.toggle('active', ['bar','sparkline','pie','progress'][i] === name);
   });
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
@@ -480,6 +489,12 @@ const pieGrid = document.getElementById('pie-grid');
 for (let i = 1; i <= 100; i++) {
   const syntax = '{p:' + i + '}';
   pieGrid.appendChild(makeCard(syntax, pieLabels[i-1]));
+}
+
+const progressGrid = document.getElementById('progress-grid');
+for (let i = 1; i <= 100; i++) {
+  const syntax = '{h:' + i + '}';
+  progressGrid.appendChild(makeCard(syntax, pieLabels[i-1]));
 }
 </script>
 </body>

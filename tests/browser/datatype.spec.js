@@ -14,7 +14,7 @@ test('loads the Datatype variable font', async ({ page }) => {
   await expect(page.locator('#bar')).toHaveCSS('font-family', /Datatype/);
 });
 
-for (const chart of ['bar', 'spark', 'pie']) {
+for (const chart of ['bar', 'spark', 'pie', 'progress']) {
   test(`${chart} syntax is substituted by OpenType features`, async ({ page }) => {
     const renderedWidth = await page.locator(`#${chart}`).evaluate(
       element => element.getBoundingClientRect().width
@@ -49,6 +49,13 @@ test('weight axis visibly changes chart rendering', async ({ page }) => {
 test('different pie values visibly produce different glyphs', async ({ page }) => {
   const quarter = await page.locator('#pie-25').screenshot();
   const threeQuarters = await page.locator('#pie-75').screenshot();
+
+  expect(quarter.equals(threeQuarters)).toBe(false);
+});
+
+test('different progress values visibly produce different fills', async ({ page }) => {
+  const quarter = await page.locator('#progress-25').screenshot();
+  const threeQuarters = await page.locator('#progress-75').screenshot();
 
   expect(quarter.equals(threeQuarters)).toBe(false);
 });

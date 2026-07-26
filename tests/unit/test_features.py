@@ -3,6 +3,7 @@
 from sources.build import _build_feature_code
 from sources.glyphs.bar import generate_bar_feature_code
 from sources.glyphs.pie import generate_pie_feature_code
+from sources.glyphs.progress import generate_progress_feature_code
 from sources.glyphs.sparkline import generate_sparkline_feature_code
 
 
@@ -39,11 +40,26 @@ def test_pie_feature_code_handles_boundary_values():
     )
 
 
+def test_progress_feature_code_handles_boundary_values():
+    feature_code = generate_progress_feature_code()
+
+    assert (
+        "sub uni007B uni0068 uni003A uni0030 uni007D by progress_0;"
+        in feature_code
+    )
+    assert (
+        "sub uni007B uni0068 uni003A uni0031 uni0030 uni0030 uni007D "
+        "by progress_100;"
+        in feature_code
+    )
+
+
 def test_combined_features_register_required_lookups():
     feature_code = _build_feature_code(100)
 
     assert "feature liga" in feature_code
     assert "lookup pie_liga;" in feature_code
+    assert "lookup progress_liga;" in feature_code
     assert "feature calt" in feature_code
     assert "lookup bar_open;" in feature_code
     assert "lookup spark_resolve_pairs;" in feature_code
