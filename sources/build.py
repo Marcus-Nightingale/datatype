@@ -1,9 +1,10 @@
 """Datatype build script: orchestrates font generation."""
 
+import argparse
 import os
+import shutil
 import sys
 import time
-import argparse
 
 # Add project root to path
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -16,6 +17,17 @@ from sources.glyphs.sparkline import draw_sparkline_glyphs, generate_sparkline_f
 from sources.glyphs.pie import draw_pie_glyphs, generate_pie_feature_code
 from sources.font_builder import build_font, build_variable_font, export_static_instance
 from sources.export import export_font
+
+
+def _sync_docs_font(variable_dir, basename):
+    """Copy the default variable WOFF2 into the GitHub Pages site."""
+    if basename != FAMILY_NAME:
+        return
+
+    source = os.path.join(variable_dir, f"{basename}[wdth,wght].woff2")
+    destination = os.path.join(PROJECT_ROOT, "docs", f"{basename}.woff2")
+    shutil.copyfile(source, destination)
+    print(f"  Synced {destination}")
 
 
 def _build_master(max_value, params, feature_code):
@@ -57,14 +69,22 @@ feature liga {{
 
 feature calt {{
     lookup bar_open;
+    lookup bar_detect_signed;
     lookup bar_propagate;
+    lookup bar_signed_propagate;
     lookup bar_combine_liga;
     lookup bar_combine_single;
+    lookup bar_signed_combine_liga;
+    lookup bar_signed_combine_single;
     lookup bar_close;
     lookup spark_open;
+    lookup spark_detect_signed;
     lookup spark_propagate;
+    lookup spark_signed_propagate;
     lookup spark_combine_liga;
     lookup spark_combine_single;
+    lookup spark_signed_combine_liga;
+    lookup spark_signed_combine_single;
     lookup spark_close;
     lookup spark_resolve_pairs;
 }} calt;
@@ -135,6 +155,7 @@ def build_dev():
     basename = f"{FAMILY_NAME}{suffix}"
     print(f"  Exporting {basename}...")
     export_font(vf, output_dir, basename, is_variable=True)
+    _sync_docs_font(output_dir, basename)
 
     elapsed = time.time() - start
     print(f"\nBuild complete in {elapsed:.1f}s")
@@ -204,6 +225,7 @@ def build_all():
         basename = f"{FAMILY_NAME}{suffix}"
         print(f"  Exporting {basename}...")
         export_font(vf, variable_dir, basename, is_variable=True)
+        _sync_docs_font(variable_dir, basename)
 
         # Export static instances (TTF to ttf/, WOFF2 to webfonts/)
         print(f"  Exporting static instances...")

@@ -13,6 +13,12 @@ def test_bar_feature_code_handles_boundary_values():
     assert "sub bar_d0 by bar_h0;" in feature_code
     assert "sub bar_d9 bar_d9 by bar_h99;" in feature_code
     assert "sub bar_d1 bar_d0 bar_d0 by bar_h100;" in feature_code
+    assert "sub bar_start' uni002D by bar_signed_start;" in feature_code
+    assert (
+        "sub bar_negative bar_nd1 bar_nd0 bar_nd0 by bar_signed_n100;"
+        in feature_code
+    )
+    assert "sub bar_sd0 by bar_signed_p0;" in feature_code
     assert "sub uni007D by bar_end;" in feature_code
 
 
@@ -22,6 +28,17 @@ def test_sparkline_feature_code_resolves_pairs():
     assert "sub uni007B uni006C uni003A by spark_start;" in feature_code
     assert "sub spark_p0 by spark_0_to_3;" in feature_code
     assert "sub spark_p3 by spark_3_to_0;" in feature_code
+    assert "sub spark_start' uni002D by spark_signed_start;" in feature_code
+    assert (
+        "sub spark_negative spark_nd3 by spark_p0;"
+        in feature_code
+    )
+    assert "sub spark_sd0 by spark_p2;" in feature_code
+    assert "@spark_separators = [spark_sep spark_signed_sep];" in feature_code
+    assert (
+        "lookup spark_resolve_to_3 @spark_separators spark_p3;"
+        in feature_code
+    )
     assert "lookup spark_resolve_pairs" in feature_code
 
 
@@ -46,4 +63,8 @@ def test_combined_features_register_required_lookups():
     assert "lookup pie_liga;" in feature_code
     assert "feature calt" in feature_code
     assert "lookup bar_open;" in feature_code
+    assert "lookup bar_detect_signed;" in feature_code
+    assert "lookup bar_signed_combine_liga;" in feature_code
+    assert "lookup spark_detect_signed;" in feature_code
+    assert "lookup spark_signed_combine_liga;" in feature_code
     assert "lookup spark_resolve_pairs;" in feature_code

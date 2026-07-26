@@ -10,10 +10,14 @@ Designed for seamless integration into text-based workflows, Datatype enables yo
 <strong>Chart Syntax:</strong>
 </p>
 <ul>
-  <li>Bar charts: <code>{b:15,45,80,30,60}</code> (up to 20 values, 0-100)</li>
-  <li>Sparklines: <code>{l:10,40,25,70,50}</code> (up to 20 points, 0-100)</li>
+  <li>Bar charts: <code>{b:-60,-20,0,45,100}</code> (up to 20 values, -100 to 100)</li>
+  <li>Sparklines: <code>{l:-80,-25,30,-10,75}</code> (up to 20 points, -100 to 100)</li>
   <li>Pie charts: <code>{p:75}</code> (single percentage value)</li>
 </ul>
+
+<p>
+When a bar chart or sparkline contains a negative value, Datatype automatically uses a signed scale with zero at the vertical midpoint. Positive-only expressions retain their original 0-100 scale and appearance.
+</p>
 
 <p>
 The font includes two variable axes for extensive customization: Width (wdth: 0-100) controls spacing and compactness, while Weight (wght: 100-900) adjusts line thickness and visual prominence. This enables designers to fine-tune charts for different contexts—from dense dashboards to prominent presentations.

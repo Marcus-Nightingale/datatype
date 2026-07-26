@@ -1,6 +1,7 @@
 """Unit tests for chart glyph generation."""
 
 from fontTools.pens.areaPen import AreaPen
+from fontTools.pens.boundsPen import BoundsPen
 from fontTools.pens.recordingPen import RecordingPen
 
 from sources.config import FontParams
@@ -22,6 +23,12 @@ def _signed_area(draw_function):
     return pen.value
 
 
+def _bounds(draw_function):
+    pen = BoundsPen(None)
+    draw_function(pen)
+    return pen.bounds
+
+
 def test_bar_glyphs_include_every_height_and_helpers():
     glyphs = {}
     params = FontParams(max_value=10, bar_width=200, bar_fill=0.5)
@@ -34,6 +41,20 @@ def test_bar_glyphs_include_every_height_and_helpers():
     assert glyphs["bar_h0"] == (200, None)
     assert glyphs["bar_h10"][0] == 200
     assert _record(glyphs["bar_h10"][1])
+    assert all(f"bar_signed_p{value}" in glyphs for value in range(11))
+    assert all(f"bar_signed_n{value}" in glyphs for value in range(1, 11))
+
+
+def test_signed_bars_extend_from_a_shared_zero_baseline():
+    glyphs = {}
+    draw_bar_glyphs(glyphs, FontParams(max_value=100))
+
+    positive_bounds = _bounds(glyphs["bar_signed_p100"][1])
+    negative_bounds = _bounds(glyphs["bar_signed_n100"][1])
+
+    assert positive_bounds[1] == negative_bounds[3]
+    assert positive_bounds[3] > positive_bounds[1]
+    assert negative_bounds[1] < negative_bounds[3]
 
 
 def test_sparkline_glyphs_cover_every_possible_pair():
@@ -51,6 +72,13 @@ def test_sparkline_glyphs_cover_every_possible_pair():
     assert all(glyphs[name][0] == 180 for name in expected_segments)
     assert _record(glyphs["spark_0_to_2"][1])
     assert _record(glyphs["spark_p2"][1])
+    assert {
+        "spark_signed_start",
+        "spark_signed_sep",
+        "spark_negative",
+    } <= glyphs.keys()
+    assert all(f"spark_sd{digit}" in glyphs for digit in range(10))
+    assert all(f"spark_nd{digit}" in glyphs for digit in range(10))
 
 
 def test_pie_glyphs_cover_zero_through_one_hundred():
@@ -80,6 +108,8 @@ def test_visible_glyphs_use_truetype_winding():
     assert _signed_area(base_glyphs[".notdef"][1]) < 0
     assert _signed_area(base_glyphs["uni0041"][1]) < 0
     assert _signed_area(bar_glyphs["bar_h10"][1]) < 0
+    assert _signed_area(bar_glyphs["bar_signed_p10"][1]) < 0
+    assert _signed_area(bar_glyphs["bar_signed_n10"][1]) < 0
     assert _signed_area(spark_glyphs["spark_0_to_2"][1]) < 0
     assert _signed_area(pie_glyphs["pie_0"][1]) < 0
     assert _signed_area(pie_glyphs["pie_50"][1]) < 0

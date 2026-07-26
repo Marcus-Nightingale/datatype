@@ -226,17 +226,19 @@ module.exports = function(eleventyConfig) {
   <h3>Bar charts</h3>
   <pre><code>{b:value,value,value,...}</code></pre>
   <ul>
-    <li>Values: 0–100</li>
+    <li>Values: -100–100</li>
     <li>Up to 20 bars</li>
-    <li>Example: <code>{b:15,45,80,30,60,90}</code></li>
+    <li>Example: <code>{b:-60,-20,0,45,100}</code></li>
+    <li>A negative value switches the expression to a centred signed scale</li>
   </ul>
 
   <h3>Sparklines</h3>
   <pre><code>{l:value,value,value,...}</code></pre>
   <ul>
-    <li>Values: 0–100</li>
+    <li>Values: -100–100</li>
     <li>Up to 20 points</li>
-    <li>Example: <code>{l:10,40,25,70,50,90}</code></li>
+    <li>Example: <code>{l:-80,-25,30,-10,75}</code></li>
+    <li>A negative value places zero at the vertical midpoint</li>
   </ul>
 
   <h3>Pie charts</h3>
@@ -295,7 +297,7 @@ font-variant-ligatures: common-ligatures contextual;</code></pre>
 
   <h3>1. Pattern Matching</h3>
   <p>Match chart syntax with this regex:</p>
-  <pre><code>/\{[blp]:\d+(?:,\d+)*\}/g</code></pre>
+  <pre><code>/\{(?:[bl]:-?\d+(?:,-?\d+)*|p:\d+)\}/g</code></pre>
 
   <h3>2. Wrapping in HTML</h3>
   <p>Wrap matches in a span with the font applied:</p>
@@ -303,7 +305,7 @@ font-variant-ligatures: common-ligatures contextual;</code></pre>
 
   <h3>3. Example: Vanilla JavaScript</h3>
   <pre><code>function renderDatatype(text) {
-  const pattern = /\{[blp]:\d+(?:,\d+)*\}/g;
+  const pattern = /\{(?:[bl]:-?\d+(?:,-?\d+)*|p:\d+)\}/g;
   return text.replace(pattern, match =&gt;
     `&lt;span class="datatype"&gt;${match}&lt;/span&gt;`
   );
@@ -316,7 +318,7 @@ document.getElementById('output').innerHTML = output;</code></pre>
 
   <h3>4. Example: Markdown-it Plugin</h3>
   <pre><code>function datatypePlugin(md) {
-  const pattern = /\{[blp]:\d+(?:,\d+)*\}/g;
+  const pattern = /\{(?:[bl]:-?\d+(?:,-?\d+)*|p:\d+)\}/g;
 
   md.core.ruler.push('datatype', state =&gt; {
     for (const token of state.tokens) {
@@ -341,7 +343,7 @@ md.use(datatypePlugin);</code></pre>
 
   <h3>5. Example: React Component</h3>
   <pre><code>function Chart({ children }) {
-  const pattern = /\{[blp]:\d+(?:,\d+)*\}/g;
+  const pattern = /\{(?:[bl]:-?\d+(?:,-?\d+)*|p:\d+)\}/g;
 
   const parts = children.split(pattern);
   const matches = children.match(pattern) || [];

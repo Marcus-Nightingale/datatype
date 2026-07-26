@@ -3,7 +3,7 @@
 import math
 from sources.config import (
     CHART_HEIGHT, CHART_BASELINE, SPARK_LINE_THICKNESS,
-    MAX_VALUE, FontParams,
+    MAX_VALUE, MAX_SPARK_DATA_POINTS, FontParams,
 )
 
 SEG_WIDTH = 200      # width of each connecting segment
@@ -17,6 +17,11 @@ def _height_for_value(v, max_value):
     if max_value == 0:
         return int(CHART_BASELINE + margin)
     return int(CHART_BASELINE + margin + usable * v / max_value)
+
+
+def _signed_position(value, max_value):
+    """Map -max_value..max_value onto the existing 0..max_value positions."""
+    return (value + max_value + 1) // 2
 
 
 def _draw_circle(pen, cx, cy, r):
@@ -94,10 +99,15 @@ def draw_sparkline_glyphs(glyph_data, params=None):
     glyph_data["spark_start"] = (0, None)
     glyph_data["spark_end"] = (20, None)
     glyph_data["spark_sep"] = (0, None)
+    glyph_data["spark_signed_start"] = (0, None)
+    glyph_data["spark_signed_sep"] = (0, None)
+    glyph_data["spark_negative"] = (0, None)
 
     # Intermediate digit glyphs (zero-width, never rendered)
     for d in range(10):
         glyph_data[f"spark_d{d}"] = (0, None)
+        glyph_data[f"spark_sd{d}"] = (0, None)
+        glyph_data[f"spark_nd{d}"] = (0, None)
 
     # Endpoint glyphs — full circle at the last data point's height
     for v in range(0, max_value + 1):
@@ -161,9 +171,9 @@ def generate_sparkline_feature_code(max_value=100):
 
     Uses intermediate digits + combine strategy (same as bars):
     1. Ligature: {l: → spark_start
-    2. Propagation: digits → spark_dN, commas → spark_sep
-    3. Combine (liga): adjacent spark_dN sequences → spark_pNN
-    4. Combine (single): remaining lone spark_dN → spark_pN
+    2. Detect whether a minus sign switches the expression to a signed scale
+    3. Propagation: digits and punctuation → intermediate chart glyphs
+    4. Combine unsigned values directly and signed values around the midpoint
     5. Close: } → spark_end
     6. Pair resolution: spark_pA spark_sep spark_pB → spark_A_to_B spark_sep spark_pB
     """
@@ -173,20 +183,51 @@ def generate_sparkline_feature_code(max_value=100):
     spark_prop_ctx = ["spark_start", "spark_sep"] + [f"spark_d{i}" for i in range(10)]
     lines.append(f"@spark_prop_ctx = [{' '.join(spark_prop_ctx)}];")
 
-    spark_close_ctx = ["spark_start", "spark_sep"] + [f"spark_p{i}" for i in range(max_value + 1)]
+    spark_signed_prop_ctx = (
+        ["spark_signed_start", "spark_signed_sep"]
+        + [f"spark_sd{i}" for i in range(10)]
+    )
+    lines.append(
+        f"@spark_signed_prop_ctx = [{' '.join(spark_signed_prop_ctx)}];"
+    )
+
+    spark_negative_prop_ctx = (
+        ["spark_negative"] + [f"spark_nd{i}" for i in range(10)]
+    )
+    lines.append(
+        f"@spark_negative_prop_ctx = [{' '.join(spark_negative_prop_ctx)}];"
+    )
+
+    spark_close_ctx = (
+        ["spark_start", "spark_sep", "spark_signed_start", "spark_signed_sep"]
+        + [f"spark_p{i}" for i in range(max_value + 1)]
+    )
     lines.append(f"@spark_close_ctx = [{' '.join(spark_close_ctx)}];")
 
     spark_points = [f"spark_p{i}" for i in range(max_value + 1)]
     lines.append(f"@spark_points = [{' '.join(spark_points)}];")
+    lines.append("@spark_separators = [spark_sep spark_signed_sep];")
 
     spark_digits = [f"uni003{d}" for d in range(10)]
     lines.append(f"@spark_digits = [{' '.join(spark_digits)}];")
+    lines.append(f"@spark_signed_scan = [{' '.join(spark_digits)} uni002C];")
     lines.append("")
 
     # --- Lookup: opening ligature {l: → spark_start ---
     lines.append("lookup spark_open {")
     lines.append("  sub uni007B uni006C uni003A by spark_start;")
     lines.append("} spark_open;")
+    lines.append("")
+
+    # --- Detect a minus anywhere in the expression ---
+    lines.append("lookup spark_detect_signed {")
+    for distance in range(MAX_SPARK_DATA_POINTS * 4 + 1):
+        scan = " ".join(["@spark_signed_scan"] * distance)
+        lookahead = f" {scan}" if scan else ""
+        lines.append(
+            f"  sub spark_start'{lookahead} uni002D by spark_signed_start;"
+        )
+    lines.append("} spark_detect_signed;")
     lines.append("")
 
     # --- Lookup: digit → intermediate ---
@@ -202,11 +243,55 @@ def generate_sparkline_feature_code(max_value=100):
     lines.append("} spark_comma;")
     lines.append("")
 
+    # --- Signed digit, sign, and comma substitutions ---
+    lines.append("lookup spark_to_signed_intermediate {")
+    for d in range(10):
+        lines.append(f"  sub uni003{d} by spark_sd{d};")
+    lines.append("} spark_to_signed_intermediate;")
+    lines.append("")
+
+    lines.append("lookup spark_to_negative_intermediate {")
+    for d in range(10):
+        lines.append(f"  sub uni003{d} by spark_nd{d};")
+    lines.append("} spark_to_negative_intermediate;")
+    lines.append("")
+
+    lines.append("lookup spark_minus {")
+    lines.append("  sub uni002D by spark_negative;")
+    lines.append("} spark_minus;")
+    lines.append("")
+
+    lines.append("lookup spark_signed_comma {")
+    lines.append("  sub uni002C by spark_signed_sep;")
+    lines.append("} spark_signed_comma;")
+    lines.append("")
+
     # --- Lookup: propagation (calt chain) ---
     lines.append("lookup spark_propagate {")
     lines.append("  sub @spark_prop_ctx @spark_digits' lookup spark_to_intermediate;")
     lines.append("  sub @spark_prop_ctx uni002C' lookup spark_comma;")
     lines.append("} spark_propagate;")
+    lines.append("")
+
+    lines.append("lookup spark_signed_propagate {")
+    lines.append(
+        "  sub @spark_signed_prop_ctx @spark_digits' "
+        "lookup spark_to_signed_intermediate;"
+    )
+    lines.append(
+        "  sub @spark_signed_prop_ctx uni002D' lookup spark_minus;"
+    )
+    lines.append(
+        "  sub @spark_signed_prop_ctx uni002C' lookup spark_signed_comma;"
+    )
+    lines.append(
+        "  sub @spark_negative_prop_ctx @spark_digits' "
+        "lookup spark_to_negative_intermediate;"
+    )
+    lines.append(
+        "  sub @spark_negative_prop_ctx uni002C' lookup spark_signed_comma;"
+    )
+    lines.append("} spark_signed_propagate;")
     lines.append("")
 
     # --- Lookup: combine ligature (multi-digit → value) ---
@@ -227,6 +312,51 @@ def generate_sparkline_feature_code(max_value=100):
     for d in range(min(10, max_value + 1)):
         lines.append(f"  sub spark_d{d} by spark_p{d};")
     lines.append("} spark_combine_single;")
+    lines.append("")
+
+    # --- Combine signed values onto the existing 101 vertical positions ---
+    lines.append("lookup spark_signed_combine_liga {")
+    if max_value >= 100:
+        positive_position = _signed_position(100, max_value)
+        negative_position = _signed_position(-100, max_value)
+        lines.append(
+            "  sub spark_sd1 spark_sd0 spark_sd0 "
+            f"by spark_p{positive_position};"
+        )
+        lines.append(
+            "  sub spark_negative spark_nd1 spark_nd0 spark_nd0 "
+            f"by spark_p{negative_position};"
+        )
+    for tens in range(1, 10):
+        for ones in range(10):
+            value = tens * 10 + ones
+            if value > max_value:
+                break
+            positive_position = _signed_position(value, max_value)
+            negative_position = _signed_position(-value, max_value)
+            lines.append(
+                f"  sub spark_sd{tens} spark_sd{ones} "
+                f"by spark_p{positive_position};"
+            )
+            lines.append(
+                f"  sub spark_negative spark_nd{tens} spark_nd{ones} "
+                f"by spark_p{negative_position};"
+            )
+    lines.append("} spark_signed_combine_liga;")
+    lines.append("")
+
+    lines.append("lookup spark_signed_combine_single {")
+    for value in range(min(10, max_value + 1)):
+        positive_position = _signed_position(value, max_value)
+        negative_position = _signed_position(-value, max_value)
+        lines.append(
+            f"  sub spark_sd{value} by spark_p{positive_position};"
+        )
+        lines.append(
+            f"  sub spark_negative spark_nd{value} "
+            f"by spark_p{negative_position};"
+        )
+    lines.append("} spark_signed_combine_single;")
     lines.append("")
 
     # --- Lookup: close substitution ---
@@ -252,7 +382,10 @@ def generate_sparkline_feature_code(max_value=100):
     # --- Pair resolution chain ---
     lines.append("lookup spark_resolve_pairs {")
     for b in range(max_value + 1):
-        lines.append(f"  sub @spark_points' lookup spark_resolve_to_{b} spark_sep spark_p{b};")
+        lines.append(
+            f"  sub @spark_points' lookup spark_resolve_to_{b} "
+            f"@spark_separators spark_p{b};"
+        )
     lines.append("} spark_resolve_pairs;")
     lines.append("")
 

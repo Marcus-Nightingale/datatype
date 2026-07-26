@@ -737,21 +737,21 @@ Results <span class="sel">&lt;span class="chart"&gt;</span>{b:30,70,20,90}<span 
 
     <div class="syntax-ref">
       <h3>Bar charts <code>{b:values}</code></h3>
-      <p>Comma-separated values, each 0&ndash;100. Up to 20 bars.</p>
+      <p>Comma-separated values from -100 to 100. Up to 20 bars. A negative value switches the chart to a centred signed scale.</p>
       <div class="ref-example">
-        <div class="rendered">{b:15,45,80,30,60}</div>
-        <code>{b:15,45,80,30,60}</code>
-        <div class="ref-details">5 bars &mdash; values set bar height as a percentage</div>
+        <div class="rendered">{b:-60,-20,0,45,100}</div>
+        <code>{b:-60,-20,0,45,100}</code>
+        <div class="ref-details">5 bars &mdash; negative values extend below zero</div>
       </div>
     </div>
 
     <div class="syntax-ref">
       <h3>Sparklines <code>{l:values}</code></h3>
-      <p>Comma-separated values, each 0&ndash;100. Up to 20 points.</p>
+      <p>Comma-separated values from -100 to 100. Up to 20 points. A negative value places zero at the midpoint.</p>
       <div class="ref-example">
-        <div class="rendered">{l:10,40,25,70,50,90,35}</div>
-        <code>{l:10,40,25,70,50,90,35}</code>
-        <div class="ref-details">7 points &mdash; values set point height as a percentage</div>
+        <div class="rendered">{l:-80,-25,30,-10,75}</div>
+        <code>{l:-80,-25,30,-10,75}</code>
+        <div class="ref-details">5 points &mdash; the line crosses a centred zero</div>
       </div>
     </div>
 

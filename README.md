@@ -10,8 +10,8 @@ Datatype uses OpenType ligature substitution to transform simple text expression
 
 ## Features
 
-- **Bar charts**: `{b:1,3,7,9,4,2}` — up to 20 values
-- **Sparklines**: `{l:2,5,3,8,1,6,4}` — up to 20 points
+- **Bar charts**: `{b:-30,20,70,-10}` — up to 20 values
+- **Sparklines**: `{l:-40,20,-10,80}` — up to 20 points
 - **Pie charts**: `{p:75}` — single percentage
 
 **Variable font axes:**
@@ -72,9 +72,11 @@ Datatype uses OpenType ligature substitution to transform simple text expression
 {b:value,value,value,...}
 ```
 
-- **Values**: 0–100
+- **Values**: -100–100
 - **Count**: Up to 20 bars
-- **Example**: `{b:15,45,80,30,60,90,20}`
+- **Example**: `{b:-60,-20,0,45,100}`
+- If any value is negative, the chart uses a centred signed scale. Existing
+  positive-only charts retain their original 0–100 scale.
 
 ### Sparklines
 
@@ -82,9 +84,11 @@ Datatype uses OpenType ligature substitution to transform simple text expression
 {l:value,value,value,...}
 ```
 
-- **Values**: 0–100
+- **Values**: -100–100
 - **Count**: Up to 20 points
-- **Example**: `{l:10,40,25,70,50,90,35,60}`
+- **Example**: `{l:-80,-25,30,-10,75}`
+- If any value is negative, zero moves to the vertical midpoint. Existing
+  positive-only sparklines retain their original 0–100 scale.
 
 ### Pie Charts
 

@@ -143,7 +143,9 @@ Before submitting changes, verify:
 
 **Visual tests:**
 - [ ] Bar charts render correctly (test: `{b:10,50,90}`)
+- [ ] Signed bars share a zero baseline (test: `{b:-100,0,100}`)
 - [ ] Sparklines connect smoothly (test: `{l:20,80,30,70}`)
+- [ ] Signed sparklines cross zero correctly (test: `{l:-100,0,100}`)
 - [ ] Pie charts fill correctly (test: `{p:25}`, `{p:75}`)
 - [ ] Variable axes interpolate smoothly (test width/weight sliders)
 
@@ -183,8 +185,8 @@ make test-browser
 ```
 
 The Playwright suite loads the generated WOFF2 file in a real browser and checks
-bar, sparkline, and pie substitutions along with variable width and weight
-behavior.
+positive and signed bar and sparkline substitutions, pie substitutions, and
+variable width and weight behavior.
 
 Run both suites:
 
@@ -311,7 +313,6 @@ We welcome contributions in these areas:
 - **Accessibility** — Improve semantic HTML, ARIA labels in specimen site
 
 ### Feature Ideas
-- **Negative values** — Support for negative data points in charts
 - **Color variants** — Multi-color chart support (COLR table)
 - **New chart types** — Horizontal bars, area charts, scatter plots
 - **Custom scales** — User-defined value ranges beyond 0-100

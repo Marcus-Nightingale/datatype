@@ -14,7 +14,7 @@ test('loads the Datatype variable font', async ({ page }) => {
   await expect(page.locator('#bar')).toHaveCSS('font-family', /Datatype/);
 });
 
-for (const chart of ['bar', 'spark', 'pie']) {
+for (const chart of ['bar', 'bar-negative', 'spark', 'spark-negative', 'pie']) {
   test(`${chart} syntax is substituted by OpenType features`, async ({ page }) => {
     const renderedWidth = await page.locator(`#${chart}`).evaluate(
       element => element.getBoundingClientRect().width
@@ -27,6 +27,13 @@ for (const chart of ['bar', 'spark', 'pie']) {
     expect(renderedWidth).toBeLessThan(literalWidth * 0.75);
   });
 }
+
+test('signed bars visibly cross the zero baseline', async ({ page }) => {
+  const positiveOnly = await page.locator('#bar').screenshot();
+  const signed = await page.locator('#bar-negative').screenshot();
+
+  expect(positiveOnly.equals(signed)).toBe(false);
+});
 
 test('width axis changes chart spacing', async ({ page }) => {
   const narrowWidth = await page.locator('#bar-narrow').evaluate(

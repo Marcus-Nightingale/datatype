@@ -263,7 +263,7 @@
 
 <h1>Datatype Preview</h1>
 <p class="subtitle">
-  Syntax: <code>{b:75,30,100}</code> <code>{l:0,25,50,75,100}</code> <code>{p:75}</code>
+  Syntax: <code>{b:-75,30,100}</code> <code>{l:-100,0,50,100}</code> <code>{p:75}</code>
   &mdash; variable font with <code>wdth</code> and <code>wght</code> axes.
   Auto-reloads on source changes.
 </p>
@@ -343,9 +343,11 @@
 <h2 class="section-toggle">Bar Charts</h2>
 <div class="section-content">
   <div class="test-card">
-    <div class="label">Values 0-100</div>
+    <div class="label">Values -100 to 100; negatives use a centred zero baseline</div>
     <div class="sample" style="font-size: 28px;">
       {b:0,10,20,30,40,50,60,70,80,90,100}<br>
+      {b:-100,-75,-50,-25,0,25,50,75,100}<br>
+      {b:80,-40,60,-90,20}<br>
       {b:75,30,100,0,50}<br>
       {b:5,50,100,7,99}<br>
       {b:3,7,2,9}<br>
@@ -357,9 +359,11 @@
 <h2 class="section-toggle">Sparklines</h2>
 <div class="section-content">
   <div class="test-card">
-    <div class="label">Values 0-100</div>
+    <div class="label">Values -100 to 100; negatives put zero at the midpoint</div>
     <div class="sample" style="font-size: 28px;">
       {l:0,25,50,75,100}<br>
+      {l:-100,-50,0,50,100}<br>
+      {l:80,-40,60,-90,20}<br>
       {l:100,0}<br>
       {l:10,90,20,80,50}<br>
       {l:2,5,3,8,1}<br>
@@ -719,7 +723,7 @@
   editor.addEventListener('input', renderEditor);
 
   // Set initial content and render
-  editor.textContent = 'Sales {l:20,50,30,80,10} are up. Revenue {b:30,70,20,90} by quarter. Budget {p:75} used.';
+  editor.textContent = 'Sales {l:-20,50,-30,80,10} changed. Revenue {b:-30,70,20,-90} by quarter. Budget {p:75} used.';
   renderEditor();
 
   // Editor now always uses Datatype font

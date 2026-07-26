@@ -414,6 +414,8 @@ const barLabels = [
 ];
 
 const barGrid = document.getElementById('bar-grid');
+barGrid.appendChild(makeCard('{b:-100,-50,0,50,100}', 'Signed Range'));
+barGrid.appendChild(makeCard('{b:80,-40,60,-90,20}', 'Mixed Values'));
 for (let i = 0; i < 100; i++) {
   const vals = makeBarData();
   const syntax = '{b:' + vals.join(',') + '}';
@@ -446,6 +448,8 @@ const sparkLabels = [
 ];
 
 const sparkGrid = document.getElementById('sparkline-grid');
+sparkGrid.appendChild(makeCard('{l:-100,-50,0,50,100}', 'Signed Range'));
+sparkGrid.appendChild(makeCard('{l:80,-40,60,-90,20}', 'Mixed Values'));
 for (let i = 0; i < 100; i++) {
   const vals = makeSparkData();
   const syntax = '{l:' + vals.join(',') + '}';
